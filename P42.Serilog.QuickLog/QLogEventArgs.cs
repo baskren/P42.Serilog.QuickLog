@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
@@ -45,7 +46,7 @@ namespace P42.Serilog.QuickLog
         /// <param name="message"></param>
         /// <param name="callerMethod"></param>
         /// <param name="lineNumber"></param>
-        internal QLogEventArgs(LogLevel logLevel, object caller, Exception exception, string message, string callerMethod, int lineNumber)
+        public QLogEventArgs(LogLevel logLevel, object caller, Exception exception, string message, string callerMethod, int lineNumber)
         {
             Level = logLevel;
             Caller = caller;
@@ -60,17 +61,32 @@ namespace P42.Serilog.QuickLog
         /// </summary>
         /// <returns></returns>
         public override string ToString()
-            => ParceMessage(Level, Caller, Exception, Message, CallerMethod, CallerLineNumber);
-
-        protected static string ParceMessage(LogLevel level, object sender, Exception ex, string message, string callerName, int lineNumber)
         {
-            var text = QLog.ParceMessage(level, sender, message, callerName, lineNumber);
+            var text = Level.ToString().ToUpper() + ": ";
 
-            if (ex != null)
+            if (Caller is Type t)
+                text += t.ToString();
+            else if (Caller is string className)
+                text += className;
+            else if (Caller is object)
+                text += Caller.GetType();
+
+            if (!string.IsNullOrEmpty(CallerMethod))
+                text += "." + CallerMethod;
+
+            if (CallerLineNumber != default && (Level & QLog.AddLineNumber) > 0)
+                text += $"[{CallerLineNumber}]";
+
+            text += " : \n\n";
+
+            if (!string.IsNullOrEmpty(Message))
+                text += Message + "\n\n";
+
+            if (Exception != null)
             {
-                if ((level & QLog.SerializeExceptionsToJson)>0)
+                if ((Level & QLog.SerializeExceptionsToJson) > 0)
                 {
-                    var json = JsonConvert.SerializeObject(ex, Formatting.Indented,
+                    var json = JsonConvert.SerializeObject(Exception, Formatting.Indented,
                     new JsonSerializerSettings()
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -78,12 +94,13 @@ namespace P42.Serilog.QuickLog
                     text += json;
                 }
                 else
-                    text += ExceptionMessageGenerator(ex);
+                    text += ExceptionMessageGenerator(Exception);
 
             }
 
             return text;
         }
+
 
         static string ExceptionMessageGenerator(Exception e, int depth = 0)
         {

@@ -95,3 +95,6 @@ using P42.Serilog.QuickLog;
 QLog.AddLineNumber = LogLevel.Fatal | LogLevel.Error;
 ```
 
+### Silent Logging
+
+To control which `LogLevels` (Verbose, Debug, Information, Warning, Error, Fatal) will **NOT** be passed along to the `QLog.Logged` event.  By default this is `LogLevels.Verbose | LogLevels.Debug`.
