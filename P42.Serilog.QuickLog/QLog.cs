@@ -35,6 +35,9 @@ namespace P42.Serilog.QuickLog
         /// <exception cref="ArgumentException"></exception>
         public static void Log(QLogEventArgs args)
         {
+            if (args.Caller is QLogEventArgs qLogArgs)
+                args = qLogArgs;
+
             switch (args.Level)
             {
                 case LogLevel.None:
