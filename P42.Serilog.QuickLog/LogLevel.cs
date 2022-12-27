@@ -8,11 +8,14 @@ namespace P42.Serilog.QuickLog
         /// Does nothing: not sent to Serilog, QLog.Logged not fired
         /// </summary>
         None = 0,
-        Fatal = 1,
-        Error = 2,
-        Warning = 4,
-        Information = 8,
-        Debug = 16,
-        Verbose = 32
+        Verbose = 1,
+        Debug = 2,
+        Information = 4,
+        Warning = 8,
+        Error = 16,
+        NotImplemented = 32,
+        Fatal = 64,
+        Permission = 128,
+        Progress = 256,
     }
 }

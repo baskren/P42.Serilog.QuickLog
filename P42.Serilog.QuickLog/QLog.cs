@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using Serilog;
@@ -20,7 +22,7 @@ namespace P42.Serilog.QuickLog
         /// <summary>
         /// Flagged levels that will not fire QLog.Logged event
         /// </summary>
-        public static LogLevel SilentLevels { get; set;} = LogLevel.Verbose | LogLevel.Debug;
+        public static LogLevel SilentLevels { get; set;} = LogLevel.Verbose | LogLevel.Debug | LogLevel.Information;
 
         /// <summary>
         /// Event called when QLog is created
@@ -35,7 +37,7 @@ namespace P42.Serilog.QuickLog
         /// <exception cref="ArgumentException"></exception>
         public static void Log(QLogEventArgs args)
         {
-            if (args.Caller is QLogEventArgs qLogArgs)
+            if (args.CallerClass is QLogEventArgs qLogArgs)
                 args = qLogArgs;
 
             switch (args.Level)
@@ -83,148 +85,227 @@ namespace P42.Serilog.QuickLog
             }
             
             if ((args.Level & SilentLevels) == 0)
-                Logged?.Invoke(args.Caller, args);
+                Logged?.Invoke(args.CallerClass, args);
         }
 
 
         /// <summary>
         /// Verbose - with Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="ex">Exception</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Verbose(object caller, Exception ex, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Log(new QLogEventArgs(LogLevel.Verbose, caller, ex, message, method, lineNumber));
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Verbose(Exception ex, string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Log(new QLogEventArgs(LogLevel.Verbose, ex, title, message, callerClass, method, lineNumber));
 
         /// <summary>
-        /// Verbose without exception
+        /// Verbose - without Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Verbose(object caller, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Verbose(caller, null, message, method, lineNumber);
-
-
-
-        /// <summary>
-        /// Debug with exception
-        /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="ex">Exception</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Debug(object caller, Exception ex, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Log(new QLogEventArgs(LogLevel.Debug, caller, ex, message, method, lineNumber));
-
-        /// <summary>
-        /// Debug without exception
-        /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Debug(object caller, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Debug(caller, null, message, method, lineNumber);
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Verbose(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Verbose(null, message, title, callerClass, method, lineNumber);
 
 
 
         /// <summary>
-        /// Information with exception
+        /// Debug - with Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="ex">Exception</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Information(object caller, Exception ex, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Log(new QLogEventArgs(LogLevel.Information, caller, ex, message, method, lineNumber));
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Debug(Exception ex, string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Log(new QLogEventArgs(LogLevel.Debug, ex, title, message, callerClass, method, lineNumber));
 
         /// <summary>
-        /// Information without exception
+        /// Debug - without Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Information(object caller, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Information(caller, null, message, method, lineNumber);
-
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Debug( string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Debug(null, message, title, callerClass, method, lineNumber);
 
 
 
         /// <summary>
-        /// Warning with exception
+        /// Information - with Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="ex">Exception</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Warning(object caller, Exception ex, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Log(new QLogEventArgs(LogLevel.Warning, caller, ex, message, method, lineNumber));
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Information(Exception ex,  string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Log(new QLogEventArgs(LogLevel.Information, ex, title, message, callerClass, method, lineNumber));
 
         /// <summary>
-        /// Warning without exception
+        /// Information - without Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Warning(object caller, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Warning(caller, null, message, method, lineNumber);
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Information( string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Information(null, message, title, callerClass, method, lineNumber);
 
 
 
 
         /// <summary>
-        /// Error with exception
+        /// Warning - with Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="ex">Exception</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Error(object caller, Exception ex, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Log(new QLogEventArgs(LogLevel.Error, caller, ex, message, method, lineNumber));
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Warning(Exception ex,  string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Log(new QLogEventArgs(LogLevel.Warning, ex, title, message, callerClass, method, lineNumber));
 
         /// <summary>
-        /// Error without Exception
+        /// Warning - without Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Error(object caller, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Error(caller, null, message, method, lineNumber);
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Warning( string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Warning(null, message, title, callerClass, method, lineNumber);
+
 
 
 
         /// <summary>
-        /// Fatal with exception
+        /// Error - with Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="ex">Exception</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Fatal(object caller, Exception ex, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Log(new QLogEventArgs(LogLevel.Fatal, caller, ex, message, method, lineNumber));
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Error(Exception ex,  string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Log(new QLogEventArgs(LogLevel.Error, ex, title, message, callerClass ?? NameOfCallingClass(), method, lineNumber));
 
         /// <summary>
-        /// Fatal without exception
+        /// Error - without Exception
         /// </summary>
-        /// <param name="caller">Caller method (string, instance, or type)</param>
-        /// <param name="message">Human readable message</param>
-        /// <param name="method">method</param>
-        /// <param name="lineNumber">line number</param>
-        public static void Fatal(object caller, string message = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => Fatal(caller, null, message, method, lineNumber);
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Error( string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Error(null, message, title, callerClass ?? NameOfCallingClass(), method, lineNumber);
 
+        /// <summary>
+        /// Not Implemented - with exception
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void NotImplemented(Exception ex, string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Log(new QLogEventArgs(LogLevel.NotImplemented, ex, title, message, callerClass ?? NameOfCallingClass(), method, lineNumber));
+
+        /// <summary>
+        /// Not Implemented - without exception
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void NotImplemented(string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => NotImplemented(null, message, title, callerClass ?? NameOfCallingClass(), method, lineNumber);
+
+        /// <summary>
+        /// Fatal - with Exception
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Fatal(Exception ex,  string message = default, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Log(new QLogEventArgs(LogLevel.Fatal, ex, title, message, callerClass ?? NameOfCallingClass(), method, lineNumber));
+
+        /// <summary>
+        /// Fatal - without Exception
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="title"></param>
+        /// <param name="callerClass"></param>
+        /// <param name="method"></param>
+        /// <param name="lineNumber"></param>
+        public static void Fatal(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => Fatal(null, message, title, callerClass ?? NameOfCallingClass(), method, lineNumber);
+
+        public static async Task<PermissionState> RequestPermission(PermissionEventArgs args)
+        {
+            Log(args);
+            await args.CompletedAsync();
+            return args.State;
+        }
+
+        public static async Task<PermissionState> RequestPermission(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => await RequestPermission(new PermissionEventArgs(title, message, callerClass, method, lineNumber));
+        
+        public static ProgressEventArgs ShowProgress(ProgressEventArgs args)
+        {
+            Log(args);
+            return args;
+        }
+
+        public static ProgressEventArgs ShowProgress(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => ShowProgress(new ProgressEventArgs(title, message, callerClass, method, lineNumber));
+        
+
+
+        public static string NameOfCallingClass()
+        {
+            string fullName;
+            Type declaringType;
+            int skipFrames = 2;
+            do
+            {
+                var sf0 = new StackFrame(0, false);
+                var m0 = sf0.GetMethod();
+                var sf1 = new StackFrame(1, false);
+                var m1 = sf1.GetMethod();
+                var sf2 = new StackFrame(2, false);
+                MethodBase method = new StackFrame(skipFrames, false).GetMethod();
+                declaringType = method.DeclaringType;
+                if (declaringType == null)
+                {
+                    return method.Name;
+                }
+                skipFrames++;
+                fullName = declaringType.FullName;
+            }
+            while (declaringType.Module.Name.Equals("mscorlib.dll", StringComparison.OrdinalIgnoreCase));
+
+            return fullName;
+        }
 
     }
 }

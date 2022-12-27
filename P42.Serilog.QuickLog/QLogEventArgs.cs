@@ -10,17 +10,24 @@ namespace P42.Serilog.QuickLog
         /// <summary>
         /// Level of Message
         /// </summary>
-        public LogLevel Level { get; private set; }
+        public LogLevel Level { get; internal set; }
 
         /// <summary>
         /// Method that created message
         /// </summary>
-        public object Caller { get; private set; }
+        public object CallerClass { get; private set; }
 
         /// <summary>
         /// Exception passed to message
         /// </summary>
         public Exception Exception { get; private set; }
+
+        public string ExceptionDump => ExceptionMessageGenerator(Exception);
+
+        /// <summary>
+        /// Title text
+        /// </summary>
+        public string Title { get; private set; }
 
         /// <summary>
         /// Message text
@@ -41,20 +48,23 @@ namespace P42.Serilog.QuickLog
         /// Constructor
         /// </summary>
         /// <param name="logLevel"></param>
-        /// <param name="caller"></param>
+        /// <param name="callerClass"></param>
         /// <param name="exception"></param>
         /// <param name="message"></param>
         /// <param name="callerMethod"></param>
         /// <param name="lineNumber"></param>
-        public QLogEventArgs(LogLevel logLevel, object caller, Exception exception, string message, string callerMethod, int lineNumber)
+        public QLogEventArgs(LogLevel logLevel, Exception exception, string title, string message, string callerClass, string callerMethod, int lineNumber)
         {
             Level = logLevel;
-            Caller = caller;
             Exception = exception;
+            Title = title;
             Message = message;
+            CallerClass = callerClass;
             CallerMethod = callerMethod;
             CallerLineNumber= lineNumber;
+            Title = title;
         }
+
 
         /// <summary>
         /// ToString override
@@ -64,12 +74,12 @@ namespace P42.Serilog.QuickLog
         {
             var text = Level.ToString().ToUpper() + ": ";
 
-            if (Caller is Type t)
+            if (CallerClass is Type t)
                 text += t.ToString();
-            else if (Caller is string className)
+            else if (CallerClass is string className)
                 text += className;
-            else if (Caller is object)
-                text += Caller.GetType();
+            else if (CallerClass is object)
+                text += CallerClass.GetType();
 
             if (!string.IsNullOrEmpty(CallerMethod))
                 text += "." + CallerMethod;
@@ -77,7 +87,12 @@ namespace P42.Serilog.QuickLog
             if (CallerLineNumber != default && (Level & QLog.AddLineNumber) > 0)
                 text += $"[{CallerLineNumber}]";
 
-            text += " : \n\n";
+            text += " : ";
+
+            if (!string.IsNullOrEmpty(Title))
+                text += "**" + Title + "**";
+
+            text += "\n\n";
 
             if (!string.IsNullOrEmpty(Message))
                 text += Message + "\n\n";
