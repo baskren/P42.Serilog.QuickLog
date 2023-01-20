@@ -22,7 +22,7 @@ namespace P42.Serilog.QuickLog
         /// </summary>
         public Exception Exception { get; private set; }
 
-        public string ExceptionDump => ExceptionMessageGenerator(Exception);
+        public string ExceptionDump => Exception.ExceptionMessageGenerator();
 
         /// <summary>
         /// Title text
@@ -109,7 +109,7 @@ namespace P42.Serilog.QuickLog
                     text += json;
                 }
                 else
-                    text += ExceptionMessageGenerator(Exception);
+                    text += Exception.ExceptionMessageGenerator();
 
             }
 
@@ -117,18 +117,6 @@ namespace P42.Serilog.QuickLog
         }
 
 
-        static string ExceptionMessageGenerator(Exception e, int depth = 0)
-        {
-            if (e is null)
-                return string.Empty;
-
-            var prefix = string.Empty;
-            for (int i = 0; i < depth; i++)
-                prefix = prefix + "INNER ";
-
-            var result = $"{prefix}EXCEPTION: {e.GetType()} {e.Message} : \n{(!string.IsNullOrWhiteSpace(e.HelpLink)?e.HelpLink+"\n":null)}{e.StackTrace}\n";
-            return result + ExceptionMessageGenerator(e.InnerException, depth + 1);
-        }
 
     }
 }
