@@ -23,7 +23,7 @@ namespace P42.Serilog.QuickLog
             for (int i = 0; i < depth; i++)
                 prefix = prefix + "INNER ";
 
-            var result = $"{prefix}EXCEPTION: {e.GetType()} {e.Message} : \n{(!string.IsNullOrWhiteSpace(e.HelpLink) ? e.HelpLink + "\n" : null)}{e.StackTrace}\n";
+            var result = $"{prefix}EXCEPTION: TYPE[{e.GetType()}] MESSAGE:[{e.Message}] : \n{"HELP["+(!string.IsNullOrWhiteSpace(e.HelpLink) ? e.HelpLink + "\n" : null)+"]"} STACK[{e.StackTrace}]\n";
             return result + ExceptionMessageGenerator(e.InnerException, depth + 1);
         }
 
