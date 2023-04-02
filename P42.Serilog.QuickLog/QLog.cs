@@ -277,7 +277,7 @@ namespace P42.Serilog.QuickLog
         }
 
         public static ProgressEventArgs ShowProgress(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => ShowProgress(new ProgressEventArgs(title, message, callerClass, method, lineNumber));
+            => ShowProgress(new ProgressEventArgs(title, message, callerClass ?? NameOfCallingClass(), method, lineNumber));
         
 
 

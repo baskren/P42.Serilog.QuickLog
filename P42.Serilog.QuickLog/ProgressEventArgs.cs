@@ -7,17 +7,21 @@ namespace P42.Serilog.QuickLog
     {
 
         #region Properties
-        int _percent;
-        public int Percent
+        double _progress = -1;
+        public double Progress
         {
-            get => _percent;
+            get => _progress;
             set
             {
-                if (_percent != value) 
+                if (_progress != value) 
                 { 
-                    _percent = value;
+                    if (value > 1)
+                        value = 1;
+                    _progress = value;
+                    ToStringSuppliment = (value * 100).ToString("D") + "%";
                     PercentChanged?.Invoke(this, value);
-                    if (value >= 100)
+                    QLog.Log(this);
+                    if (value >= 1)
                         Complete();
                 }
             }
@@ -30,7 +34,7 @@ namespace P42.Serilog.QuickLog
 
 
         #region Events
-        public event EventHandler<int> PercentChanged;
+        public event EventHandler<double> PercentChanged;
         #endregion
 
 
@@ -46,19 +50,16 @@ namespace P42.Serilog.QuickLog
         }
         #endregion
 
-
+        bool completed;
         public void Complete()
         {
-            Percent = 100;
+            if (completed)
+                return;
+            completed = true;
+            Progress = 1;
             tcs.SetResult(true);
         }
 
-        public override string ToString()
-        {
-            var result = base.ToString();
-            result += Percent + "%";
-            return result;
-        }
     }
 
 }

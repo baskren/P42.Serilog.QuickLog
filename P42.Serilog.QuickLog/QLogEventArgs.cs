@@ -44,6 +44,9 @@ namespace P42.Serilog.QuickLog
         /// </summary>
         public int CallerLineNumber { get; private set; }
 
+
+        protected string ToStringSuppliment { get; set; }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -96,6 +99,9 @@ namespace P42.Serilog.QuickLog
 
             if (!string.IsNullOrEmpty(Message))
                 text += Message + "\n\n";
+
+            if (!string.IsNullOrEmpty(ToStringSuppliment))
+                text += ToStringSuppliment + "\n\n";
 
             if (Exception != null)
             {
