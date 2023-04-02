@@ -1,9 +1,11 @@
+using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
 {
-    public class PermissionEventArgs : ProgressEventArgs
+    public class PermissionEventArgs : CompletionEventArgs<PermissionState>
     {
         PermissionState _state = PermissionState.Pending;
         public PermissionState State 
@@ -14,15 +16,27 @@ namespace P42.Serilog.QuickLog
                 if (_state != value)
                 {
                     _state = value;
-                    Complete();
+                    InnerComplete();
                 }
             }
         }
 
+        protected override string ToStringSuppliment => $"Permission: [{_state}]";
+
         public PermissionEventArgs(string title, string message, string callerClass, string callerMethod, int lineNumber) :
-            base(title, message, callerClass, callerMethod, lineNumber)
+            base(LogLevel.Permission, title, message, callerClass, callerMethod, lineNumber)
         {
-            Level = LogLevel.Permission;
+        }
+
+        protected override bool InnerComplete()
+        {
+            if (!base.InnerComplete())
+            {
+                tcs.SetResult(_state);
+                return false;
+            }
+            return true;
+
         }
     }
 

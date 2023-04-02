@@ -1,9 +1,10 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
 {
-    public class ProgressEventArgs : QLogEventArgs
+    public class ProgressEventArgs : CompletionEventArgs<bool>
     {
 
         #region Properties
@@ -18,46 +19,41 @@ namespace P42.Serilog.QuickLog
                     if (value > 1)
                         value = 1;
                     _progress = value;
-                    ToStringSuppliment = (value * 100).ToString("D") + "%";
                     PercentChanged?.Invoke(this, value);
                     QLog.Log(this);
                     if (value >= 1)
-                        Complete();
+                        InnerComplete();
                 }
             }
         }
 
-        public Task CompletedAsync() => tcs.Task;
-
-        public bool IsComplete => tcs.Task.IsCompleted;
+        protected override string ToStringSuppliment => (_progress * 100).ToString("D") + "%";
         #endregion
-
 
         #region Events
         public event EventHandler<double> PercentChanged;
         #endregion
 
 
-        #region Fields
-        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        #endregion
-
-
         #region Construction
         public ProgressEventArgs(string title, string message, string callerClass, string callerMethod, int lineNumber) :
-            base(LogLevel.Progress, null, title, message, callerClass, callerMethod, lineNumber)
+            base(LogLevel.Progress, title, message, callerClass, callerMethod, lineNumber)
         {
         }
         #endregion
 
-        bool completed;
         public void Complete()
+            => InnerComplete();
+
+        protected override bool InnerComplete()
         {
-            if (completed)
-                return;
-            completed = true;
-            Progress = 1;
-            tcs.SetResult(true);
+            if (!base.InnerComplete())
+            {
+                Progress = 1;
+                tcs.SetResult(true);
+                return false;
+            }
+            return true;
         }
 
     }

@@ -45,7 +45,7 @@ namespace P42.Serilog.QuickLog
         public int CallerLineNumber { get; private set; }
 
 
-        protected string ToStringSuppliment { get; set; }
+        protected virtual string ToStringSuppliment { get; }
 
         /// <summary>
         /// Constructor
