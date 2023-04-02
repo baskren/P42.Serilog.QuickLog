@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
 {
-    public class PermissionEventArgs : CompletionEventArgs<PermissionState>
+    public class PermissionLogger : CompletionLogger<PermissionState>
     {
         PermissionState _state = PermissionState.Pending;
         public PermissionState State 
@@ -23,7 +23,7 @@ namespace P42.Serilog.QuickLog
 
         protected override string ToStringSuppliment => $"Permission: [{_state}]";
 
-        public PermissionEventArgs(string title, string message, string callerClass, string callerMethod, int lineNumber) :
+        public PermissionLogger(string title, string message, string callerClass, string callerMethod, int lineNumber) :
             base(LogLevel.Permission, title, message, callerClass, callerMethod, lineNumber)
         {
         }

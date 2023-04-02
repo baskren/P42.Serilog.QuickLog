@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
 {
-    public class ProgressEventArgs : CompletionEventArgs<bool>
+    public class ProgressLogger : CompletionLogger<bool>
     {
 
         #region Properties
@@ -36,7 +36,7 @@ namespace P42.Serilog.QuickLog
 
 
         #region Construction
-        public ProgressEventArgs(string title, string message, string callerClass, string callerMethod, int lineNumber) :
+        public ProgressLogger(string title, string message, string callerClass, string callerMethod, int lineNumber) :
             base(LogLevel.Progress, title, message, callerClass, callerMethod, lineNumber)
         {
         }

@@ -260,7 +260,7 @@ namespace P42.Serilog.QuickLog
         public static void Fatal(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
             => Fatal(null, message, title, callerClass ?? NameOfCallingClass(), method, lineNumber);
 
-        public static async Task<PermissionState> RequestPermission(PermissionEventArgs args)
+        public static async Task<PermissionState> RequestPermission(PermissionLogger args)
         {
             Log(args);
             await args.CompletedAsync();
@@ -268,16 +268,16 @@ namespace P42.Serilog.QuickLog
         }
 
         public static async Task<PermissionState> RequestPermission(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => await RequestPermission(new PermissionEventArgs(title, message, callerClass, method, lineNumber));
+            => await RequestPermission(new PermissionLogger(title, message, callerClass, method, lineNumber));
         
-        public static ProgressEventArgs ShowProgress(ProgressEventArgs args)
+        public static ProgressLogger ShowProgress(ProgressLogger args)
         {
             Log(args);
             return args;
         }
 
-        public static ProgressEventArgs ShowProgress(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
-            => ShowProgress(new ProgressEventArgs(title, message, callerClass ?? NameOfCallingClass(), method, lineNumber));
+        public static ProgressLogger ShowProgress(string message, string title = default, string callerClass = default, [CallerMemberName] string method = default, [CallerLineNumber] int lineNumber = default)
+            => ShowProgress(new ProgressLogger(title, message, callerClass ?? NameOfCallingClass(), method, lineNumber));
         
 
 

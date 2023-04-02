@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
 {
-    public class CompletionEventArgs<T> : QLogEventArgs 
+    public class CompletionLogger<T> : QLogEventArgs 
     {
 
         #region Properties
@@ -20,7 +20,7 @@ namespace P42.Serilog.QuickLog
 
 
         #region Construction
-        public CompletionEventArgs(LogLevel level, string title, string message, string callerClass, string callerMethod, int lineNumber) :
+        public CompletionLogger(LogLevel level, string title, string message, string callerClass, string callerMethod, int lineNumber) :
             base(level, null, title, message, callerClass, callerMethod, lineNumber)
         {
         }
