@@ -1,11 +1,14 @@
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
 {
     public class ProgressLogger : CompletionLogger<bool>
     {
+
+        public static ObservableCollection<ProgressLogger> ActiveLoggers = new();
 
         #region Properties
         double _progress = -1;
@@ -19,7 +22,7 @@ namespace P42.Serilog.QuickLog
                     if (value > 1)
                         value = 1;
                     _progress = value;
-                    PercentChanged?.Invoke(this, value);
+                    ProgressChanged?.Invoke(this, value);
                     QLog.Log(this);
                     if (value >= 1)
                         InnerComplete();
@@ -27,11 +30,19 @@ namespace P42.Serilog.QuickLog
             }
         }
 
-        protected override string ToStringSuppliment => (_progress * 100).ToString("D") + "%";
+        protected override string ToStringSupplement
+        {
+            get
+            {
+                var result = $"Progress: [{(Progress >= 0 ? Progress.ToString("P0") : "INDETERMINATE")}]";
+                return result ;
+            }
+        }
+
         #endregion
 
         #region Events
-        public event EventHandler<double> PercentChanged;
+        public event EventHandler<double> ProgressChanged;
         #endregion
 
 
@@ -39,6 +50,7 @@ namespace P42.Serilog.QuickLog
         public ProgressLogger(string title, string message, string callerClass, string callerMethod, int lineNumber) :
             base(LogLevel.Progress, title, message, callerClass, callerMethod, lineNumber)
         {
+            ActiveLoggers.Add(this);
         }
         #endregion
 
@@ -50,6 +62,7 @@ namespace P42.Serilog.QuickLog
             if (!base.InnerComplete())
             {
                 Progress = 1;
+                ActiveLoggers.Remove(this);
                 tcs.SetResult(true);
                 return false;
             }

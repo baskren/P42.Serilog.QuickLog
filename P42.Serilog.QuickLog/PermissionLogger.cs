@@ -16,12 +16,15 @@ namespace P42.Serilog.QuickLog
                 if (_state != value)
                 {
                     _state = value;
+                    StateChanged?.Invoke(this, value);
                     InnerComplete();
                 }
             }
         }
 
-        protected override string ToStringSuppliment => $"Permission: [{_state}]";
+        protected override string ToStringSupplement => $"Permission: [{_state}]";
+
+        public event EventHandler<PermissionState> StateChanged;
 
         public PermissionLogger(string title, string message, string callerClass, string callerMethod, int lineNumber) :
             base(LogLevel.Permission, title, message, callerClass, callerMethod, lineNumber)

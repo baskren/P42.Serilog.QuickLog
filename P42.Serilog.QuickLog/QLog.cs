@@ -74,14 +74,12 @@ namespace P42.Serilog.QuickLog
                     else
                         global::Serilog.Log.Debug(args.Exception, args.ToString());
                     break;
-                case LogLevel.Verbose:
+                default:
                     if (args.Exception is null)
                         global::Serilog.Log.Verbose(args.ToString());
                     else
                         global::Serilog.Log.Verbose(args.Exception, args.ToString());
                     break;
-                default:
-                    throw new ArgumentException($"Invalid LogLevel [{args.Level}]");
             }
             
             if ((args.Level & SilentLevels) == 0)

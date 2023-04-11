@@ -45,7 +45,7 @@ namespace P42.Serilog.QuickLog
         public int CallerLineNumber { get; private set; }
 
 
-        protected virtual string ToStringSuppliment { get; }
+        protected virtual string ToStringSupplement { get; }
 
         /// <summary>
         /// Constructor
@@ -81,7 +81,7 @@ namespace P42.Serilog.QuickLog
                 text += t.ToString();
             else if (CallerClass is string className)
                 text += className;
-            else if (CallerClass is object)
+            else if (CallerClass is not null)
                 text += CallerClass.GetType();
 
             if (!string.IsNullOrEmpty(CallerMethod))
@@ -100,8 +100,8 @@ namespace P42.Serilog.QuickLog
             if (!string.IsNullOrEmpty(Message))
                 text += Message + "\n\n";
 
-            if (!string.IsNullOrEmpty(ToStringSuppliment))
-                text += ToStringSuppliment + "\n\n";
+            if (!string.IsNullOrEmpty(ToStringSupplement))
+                text += ToStringSupplement + "\n\n";
 
             if (Exception != null)
             {

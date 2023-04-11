@@ -1,9 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace P42.Serilog.QuickLog
 {
-    public class CompletionLogger<T> : QLogEventArgs 
+    public class CompletionLogger<T> : QLogEventArgs
     {
 
         #region Properties
@@ -15,7 +16,8 @@ namespace P42.Serilog.QuickLog
 
 
         #region Fields
-        protected TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
+        bool completed;
+        protected TaskCompletionSource<T> tcs = new();
         #endregion
 
 
@@ -27,7 +29,6 @@ namespace P42.Serilog.QuickLog
         #endregion
 
 
-        bool completed;
         protected virtual bool InnerComplete()
         {
             if (completed)
@@ -35,6 +36,7 @@ namespace P42.Serilog.QuickLog
             completed = true;
             return false;
         }
+
     }
 
 }
