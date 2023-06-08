@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace P42.Serilog.QuickLog
 {
@@ -17,7 +18,7 @@ namespace P42.Serilog.QuickLog
 
         #region Fields
         bool completed;
-        protected TaskCompletionSource<T> tcs = new();
+        protected TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
         #endregion
 
 

@@ -1,4 +1,6 @@
 
+using System;
+
 namespace P42.Serilog.QuickLog
 {
     [Flags]

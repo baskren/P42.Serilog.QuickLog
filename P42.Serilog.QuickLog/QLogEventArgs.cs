@@ -81,7 +81,7 @@ namespace P42.Serilog.QuickLog
                 text += t.ToString();
             else if (CallerClass is string className)
                 text += className;
-            else if (CallerClass is not null)
+            else if (CallerClass != null)
                 text += CallerClass.GetType();
 
             if (!string.IsNullOrEmpty(CallerMethod))

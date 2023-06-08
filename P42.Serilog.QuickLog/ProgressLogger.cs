@@ -8,7 +8,7 @@ namespace P42.Serilog.QuickLog
     public class ProgressLogger : CompletionLogger<bool>
     {
 
-        public static ObservableCollection<ProgressLogger> ActiveLoggers = new();
+        public static ObservableCollection<ProgressLogger> ActiveLoggers = new ObservableCollection<ProgressLogger>();
 
         #region Properties
         double _progress = -1;
